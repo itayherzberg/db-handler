@@ -7,23 +7,25 @@ import time
 app = FastAPI()
 
 # Database connection configuration from environment variables 
-DB_HOST = os.getenv('DB_HOST', 'database-container')
-DB_NAME = os.getenv('DB_NAME', 'user_db')
-DB_USER = os.getenv('DB_USER', 'admin')
-DB_PASS = os.getenv('DB_PASS', 'password123')
+DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv('DB_USER')
+DB_PASS = os.getenv('DB_PASS')
 
 def get_db_connection():
-    # Retry logic for the database to finish booting 
-    for _ in range(5):
+    for i in range(5):
         try:
             conn = psycopg2.connect(
                 host=DB_HOST,
                 database=DB_NAME,
                 user=DB_USER,
-                password=DB_PASS
+                password=DB_PASS,
+                connect_timeout=3  
             )
+            print('Connected to DB successfully!')
             return conn
-        except Exception:
+        except Exception as e:
+            print(f'Connection failed: {e}')
             time.sleep(5)
     return None
 
